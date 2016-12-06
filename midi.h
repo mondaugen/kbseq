@@ -50,9 +50,11 @@
 
 #ifdef OSX 
 typedef MIDIPacket vvvv_midipckt_t;
+typedef MIDITimeStamp vvvv_midi_tmstmp_t;
 /* Get the message data given a pointer to a midi packet */
 #define VVVV_MIDIPCKT_GET_MSG_DATA(p) ((p)->data)
 #define VVVV_MIDIPCKT_GET_TIMESTAMP(p) ((p)->timeStamp) 
+typedef MIDIPacketList vvvv_midipcktlst_t;
 #endif
 
 #define VVVV_MIDIPCKT_NOTE_GET_PCH(p) \
