@@ -15,14 +15,16 @@
 #define MIDIMSG_DATA_BYTE_MAX 127 
 #define MIDIMSG_NCHANNELS   16 
 
-#define MIDIMSG_NOTE_OFF    0x80
-#define MIDIMSG_NOTE_ON     0x90
-#define MIDIMSG_POLY_PRS    0xa0
-#define MIDIMSG_CNTRL_CHNG  0xb0
-#define MIDIMSG_PRGRM_CHNG  0xc0
-#define MIDIMSG_CHN_PRS     0xd0
-#define MIDIMSG_PCH_BND     0xe0
-#define MIDIMSG_SYS_COMMON  0xf0
+typedef enum {
+        MIDIMSG_NOTE_OFF    = 0x80,
+        MIDIMSG_NOTE_ON     = 0x90,
+        MIDIMSG_POLY_PRS    = 0xa0,
+        MIDIMSG_CNTRL_CHNG  = 0xb0,
+        MIDIMSG_PRGRM_CHNG  = 0xc0,
+        MIDIMSG_CHN_PRS     = 0xd0,
+        MIDIMSG_PCH_BND     = 0xe0,
+        MIDIMSG_SYS_COMMON  = 0xf0,
+} MIDIMSG_status_t;
 
 #define MIDIMSG_IS_STATUS(x) ((x) & 0x80) 
 #define MIDIMSG_IS_DATA(x)   (!(MIDIMSG_IS_STATUS(x))) 
@@ -50,11 +52,12 @@
 
 #ifdef OSX 
 typedef MIDIPacket vvvv_midi_pckt_t;
-typedef MIDITimeStamp vvvv_midi_tmstmp_t;
 /* Get the message data given a pointer to a midi packet */
 #define VVVV_MIDIPCKT_GET_MSG_DATA(p) ((p)->data)
 #define VVVV_MIDIPCKT_GET_TIMESTAMP(p) ((p)->timeStamp) 
 typedef MIDIPacketList vvvv_midi_pckt_lst_t;
+/* Get the size of a vvvv_midi_pckt_lst_t that can hold n packets */
+#define VVVV_MIDI_PCKT_LST_SZ(n) (sizeof(vvvv_midi_pckt_lst_t) + (n) * sizeof(vvvv_midi_pckt_t))
 #endif
 
 #define VVVV_MIDIPCKT_NOTE_GET_PCH(p) \
