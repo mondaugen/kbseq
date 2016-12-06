@@ -38,16 +38,16 @@ void vvvv_mnoh_init(vvvv_mnoh_t *mnoh)
  */
 vvvv_err_t vvvv_mnoh_insert(vvvv_mnoh_t *mnoh, vvvv_midi_pckt_t *p)
 {
-    if (!MIDIMSG_IS_NOTE_OFF(VVVV_MIDIPCKT_GET_MSG_DATA(p)[0])) {
+    if (!MIDIMSG_IS_NOTE_OFF(VVVV_MIDI_PCKT_GET_MSG_DATA(p)[0])) {
         return vvvv_err_EINVAL;
     }
-    size_t pitch = (size_t)VVVV_MIDIPCKT_NOTE_GET_PCH(p);
+    size_t pitch = (size_t)VVVV_MIDI_PCKT_NOTE_GET_PCH(p);
     if (mnoh->elems[pitch].curidx >= mnoh->heap.size) {
         /* Not in heap */
         mnoh->elems[pitch].packet = *p;
         (void) Heap_push(&mnoh->heap, (void*)&mnoh->elems[pitch]);
-    } else if (VVVV_MIDIPCKT_GET_TIMESTAMP(&mnoh->elems[pitch].packet) <
-            VVVV_MIDIPCKT_GET_TIMESTAMP(p)) {
+    } else if (VVVV_MIDI_PCKT_GET_TIMESTAMP(&mnoh->elems[pitch].packet) <
+            VVVV_MIDI_PCKT_GET_TIMESTAMP(p)) {
         /* In heap but timestamp is less than this event's time stamp */
         mnoh->elems[pitch].packet = *p;
         Heap_heapify(&mnoh->heap, mnoh->elems[pitch].curidx);

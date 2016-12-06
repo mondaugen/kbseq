@@ -53,17 +53,17 @@ typedef enum {
 #ifdef OSX 
 typedef MIDIPacket vvvv_midi_pckt_t;
 /* Get the message data given a pointer to a midi packet */
-#define VVVV_MIDIPCKT_GET_MSG_DATA(p) ((p)->data)
-#define VVVV_MIDIPCKT_GET_TIMESTAMP(p) ((p)->timeStamp) 
+#define VVVV_MIDI_PCKT_GET_MSG_DATA(p) ((p)->data)
+#define VVVV_MIDI_PCKT_GET_TIMESTAMP(p) ((p)->timeStamp) 
 typedef MIDIPacketList vvvv_midi_pckt_lst_t;
 /* Get the size of a vvvv_midi_pckt_lst_t that can hold n packets */
 #define VVVV_MIDI_PCKT_LST_SZ(n) (sizeof(vvvv_midi_pckt_lst_t) + (n) * sizeof(vvvv_midi_pckt_t))
 #endif
 
-#define VVVV_MIDIPCKT_NOTE_GET_PCH(p) \
-   MIDIMSG_NOTE_GET_PCH(VVVV_MIDIPCKT_GET_MSG_DATA(p)) 
+#define VVVV_MIDI_PCKT_NOTE_GET_PCH(p) \
+   MIDIMSG_NOTE_GET_PCH(VVVV_MIDI_PCKT_GET_MSG_DATA(p)) 
 
-#define VVVV_MIDIPCKT_NOTE_GET_VEL(p) \
-   MIDIMSG_NOTE_GET_VEL(VVVV_MIDIPCKT_GET_MSG_DATA(p)) 
+#define VVVV_MIDI_PCKT_NOTE_GET_VEL(p) \
+   MIDIMSG_NOTE_GET_VEL(VVVV_MIDI_PCKT_GET_MSG_DATA(p)) 
 
 #endif /* MIDI_H */
