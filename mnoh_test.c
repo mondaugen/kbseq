@@ -8,7 +8,7 @@
 	//UInt16				length;
 	//Byte				data[256];
 
-void print_note_packet(vvvv_midipckt_t *p)
+void print_note_packet(vvvv_midi_pckt_t *p)
 {
     printf("Time: %3llu Status: %3d, Pitch: %3d, Vel: %3d\n",
             p->timeStamp,
@@ -21,7 +21,7 @@ void print_note_packet(vvvv_midipckt_t *p)
 
 int vvvv_mnoh_test_ordered(void)
 {
-    vvvv_midipckt_t noteon_packets[] = {
+    vvvv_midi_pckt_t noteon_packets[] = {
         {0,3,{MIDIMSG_NOTE_ON,1,100}},
         {2,3,{MIDIMSG_NOTE_ON,2,99}},
         {4,3,{MIDIMSG_NOTE_ON,3,98}},
@@ -29,7 +29,7 @@ int vvvv_mnoh_test_ordered(void)
         {8,3,{MIDIMSG_NOTE_ON,5,96}},
     };
 
-    vvvv_midipckt_t noteoff_packets[] = {
+    vvvv_midi_pckt_t noteoff_packets[] = {
         {14,3,{MIDIMSG_NOTE_OFF,1,0}},
         {16,3,{MIDIMSG_NOTE_OFF,2,100}},
         {18,3,{MIDIMSG_NOTE_OFF,3,0}},
@@ -45,7 +45,7 @@ int vvvv_mnoh_test_ordered(void)
     VVVV_MNOH_ALLOC_STACK(mnoh);
     vvvv_mnoh_init(mnoh);
     for (i = 0;
-         i < (sizeof(noteoff_packets)/sizeof(vvvv_midipckt_t));
+         i < (sizeof(noteoff_packets)/sizeof(vvvv_midi_pckt_t));
          i++) {
         vvvv_mnoh_insert(mnoh, &noteoff_packets[i]);
     }
@@ -55,7 +55,7 @@ int vvvv_mnoh_test_ordered(void)
 #endif 
     while (time < MAX_TIME) {
         for (i = 0;
-             i < (sizeof(noteon_packets)/sizeof(vvvv_midipckt_t));
+             i < (sizeof(noteon_packets)/sizeof(vvvv_midi_pckt_t));
              i++) {
             if (time == noteon_packets[i].timeStamp) {
                 print_note_packet(&noteon_packets[i]);

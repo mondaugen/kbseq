@@ -36,7 +36,7 @@ void vvvv_mnoh_init(vvvv_mnoh_t *mnoh)
  * add it to the heap if its timestamp is further into the future than the one
  * on the heap, or a note off with this pitch is not present on the heap.
  */
-vvvv_err_t vvvv_mnoh_insert(vvvv_mnoh_t *mnoh, vvvv_midipckt_t *p)
+vvvv_err_t vvvv_mnoh_insert(vvvv_mnoh_t *mnoh, vvvv_midi_pckt_t *p)
 {
     if (!MIDIMSG_IS_NOTE_OFF(VVVV_MIDIPCKT_GET_MSG_DATA(p)[0])) {
         return vvvv_err_EINVAL;
