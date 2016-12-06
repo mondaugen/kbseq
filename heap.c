@@ -19,17 +19,23 @@
 #define RIGHT(i) (LEFT(i)+1) 
 
 /* swap keys */
-#define SWAP(a,b) \
+#define SWAP(h,a,i_a,b,i_b) \
     void *__tmp; \
     __tmp = a; \
     a = b; \
-    b = __tmp
+    h->set_idx(a,i_a); \
+    b = __tmp; \
+    h->set_idx(b,i_b)
 
-void Heap_init(Heap *H, size_t maxsize, int (*cmp)(void*,void*))
+void Heap_init(Heap *H,
+               size_t maxsize,
+               int (*cmp)(void*,void*),
+               void (*set_idx)(void*,size_t))
 {
     H->maxsize = maxsize;
     H->size = 0;
     H->cmp = cmp;
+    H->set_idx = set_idx;
 }
 
 void Heap_heapify(Heap *H, size_t i)
@@ -48,11 +54,17 @@ void Heap_heapify(Heap *H, size_t i)
         if (min == i) {
             break;
         }
-        SWAP(H->A[i], H->A[min]);
+        SWAP(H, H->A[i], i, H->A[min], min);
         i = min;
     }
 }
 
+/* Make a heap from contiguous array A.
+ * If the items in A are to store their own index in the resulting heap, these
+ * items should have their indices intialized to their index in the original A.
+ * E.g, assuming A's actual type has an index field "idx", before Heap_make_heap
+ * is called it should be that ((Type*)A[0])->idx = 0, ((Type*)A[1])->idx = 1, etc;
+ */
 HeapErr Heap_make_heap(Heap *H, void **A, size_t size)
 {
     if (size > H->maxsize) {
@@ -67,7 +79,7 @@ HeapErr Heap_make_heap(Heap *H, void **A, size_t size)
     return HEAP_ENONE;
 }
 
-HeapErr Heap_remove_min(Heap *H, void **key)
+HeapErr Heap_pop(Heap *H, void **key)
 {
     if (!H->size) {
         return HEAP_EEMPTY;
@@ -76,6 +88,7 @@ HeapErr Heap_remove_min(Heap *H, void **key)
         return HEAP_EINVAL;
     }
     *key = H->A[0];
+    H->set_idx(*key,H->maxsize);
     H->A[0] = H->A[H->size - 1];
     H->size--;
     Heap_heapify(H, 0);
@@ -86,17 +99,20 @@ static void float_up_last(Heap *H)
 {
     size_t i = H->size - 1;
     while ((i > 0) && (H->cmp(H->A[PARENT(i)],H->A[i]))) {
-        SWAP(H->A[PARENT(i)], H->A[i]);
+        SWAP(H, H->A[PARENT(i)], PARENT(i), H->A[i], i);
         i = PARENT(i);
     }
 }
 
+/* For this, the items need not have their index field initialized. It will be
+ * initialized provided set_idx is a function that sets the item's index. */
 HeapErr Heap_push(Heap *H, void *key)
 {
     if (H->size == H->maxsize) {
         return HEAP_EFULL;
     }
     H->A[H->size] = key;
+    H->set_idx(H->A[H->size],H->size);
     H->size++;
     float_up_last(H);
     return HEAP_ENONE;
