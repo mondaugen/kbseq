@@ -3,19 +3,11 @@
  * Test the MIDI note off heap.
  */
 #include "mnoh.h"
+#include "test.h" 
 
 	//MIDITimeStamp		timeStamp;
 	//UInt16				length;
 	//Byte				data[256];
-
-void print_note_packet(vvvv_midi_pckt_t *p)
-{
-    printf("Time: %3llu Status: %3d, Pitch: %3d, Vel: %3d\n",
-            p->timeStamp,
-            p->data[0],
-            p->data[1],
-            p->data[2]);
-}
 
 #define MAX_TIME 23
 
@@ -61,16 +53,15 @@ int vvvv_mnoh_test_ordered(void)
                 print_note_packet(&noteon_packets[i]);
             }
         }
-        while (1) {
+        while (mnoh->heap.size) {
             vvvv_mnoh_elem_t *elem;
             elem = (vvvv_mnoh_elem_t*)(mnoh->heap.A[0]);
             if (elem->packet.timeStamp == time) {
                 HeapErr err;
                 err = Heap_pop(&mnoh->heap,(void**)&elem);
-                if (err) {
-                    break;
+                if (!err) {
+                    print_note_packet(&elem->packet);
                 }
-                print_note_packet(&elem->packet);
             } else {
                 break;
             }

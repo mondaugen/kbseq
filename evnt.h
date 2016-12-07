@@ -6,7 +6,9 @@ evnt.h
 Event base class
 */
 
+#include "err.h" 
 #include "midi.h" 
+#include "tmstmp.h" 
 
 #include <stddef.h> 
 #include <stdint.h> 
@@ -21,38 +23,12 @@ typedef struct vvvv_evnt_t {
     midi bytes
     size_t is the size of this list in bytes
     */
-    void get_midi_pckt_lst(vvvv_evnt_t *, vvvv_midi_pckt_lst_t *, size_t);
+    vvvv_err_t (*get_midi_pckt_lst)(struct vvvv_evnt_t *, vvvv_midi_pckt_lst_t *, size_t);
 } vvvv_evnt_t;
 
 void vvvv_evnt_init(vvvv_evnt_t *ev,
                     vvvv_tmstmp_t ts,
                     vvvv_tmstmp_t len,
-                    void get_midi_pckt_lst(vvvv_evnt_t *, vvvv_midi_pckt_lst_t *, size_t));
-
-typedef enum {
-    vvvv_nt_evnt_typ_UNKNOWN,
-    vvvv_nt_evnt_typ_PITCHED,
-} vvvv_nt_evnt_typ_t;
-
-typedef struct vvvv_nt_evnt_ptchd_t {
-    float pitch;
-    float vel;
-} vvvv_nt_evnt_ptchd_t;
-
-typedef union {
-    vvvv_nt_evnt_ptchd_t pitched;
-} vvvv_nt_evnt_dt_t;
-
-typedef struct vvvv_nt_evnt_t {
-    vvvv_evnt_t super;
-    vvvv_nt_evnt_typ_t typ;
-    vvvv_nt_evnt_dt_t dt;
-} vvvv_nt_evnt_t;
-
-void vvvv_nt_evnt_init(vvvv_nt_evnt_t *ev,
-                       vvvv_tmstmp_t ts,
-                       vvvv_tmstmp_t len,
-                       vvvv_nt_evnt_typ_t type);
-
+                    vvvv_err_t get_midi_pckt_lst(vvvv_evnt_t *, vvvv_midi_pckt_lst_t *, size_t));
 
 #endif /* EVNT_H */
