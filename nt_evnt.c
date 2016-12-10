@@ -67,6 +67,12 @@ static vvvv_err_t get_midi_pckt_lst(vvvv_evnt_t *ev,
     }
 }
 
+static vvvv_ord_t get_ord(vvvv_evnt_t *ev)
+{
+    vvvv_nt_evnt_t *nev = (vvvv_nt_evnt_t*)ev;
+    return (vvvv_ord_t)nev->pitch;
+}
+
 void vvvv_nt_evnt_init(vvvv_nt_evnt_t *nev,
                        vvvv_tmstmp_t ts,
                        vvvv_tmstmp_t len,
@@ -77,7 +83,9 @@ void vvvv_nt_evnt_init(vvvv_nt_evnt_t *nev,
 #endif  
     switch (typ) {
         case vvvv_nt_evnt_typ_PITCHED:
-            vvvv_evnt_init((vvvv_evnt_t*)nev, ts, len, get_midi_pckt_lst);
+            vvvv_evnt_init((vvvv_evnt_t*)nev, ts, len);
+            vvvv_evnt_set_get_midi_pckt_lst(nev,get_midi_pckt_lst);
+            vvvv_evnt_set_get_ord(nev,get_ord);
             nev->typ = typ;
             nev->dt.pitched.get_midi_note_on = get_midi_note_on;
             nev->dt.pitched.get_midi_note_off = get_midi_note_off;
