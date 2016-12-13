@@ -70,7 +70,7 @@ static vvvv_err_t get_midi_pckt_lst(vvvv_evnt_t *ev,
 static vvvv_ord_t get_ord(vvvv_evnt_t *ev)
 {
     vvvv_nt_evnt_t *nev = (vvvv_nt_evnt_t*)ev;
-    return (vvvv_ord_t)nev->pitch;
+    return (vvvv_ord_t)nev->dt.pitched.pitch;
 }
 
 void vvvv_nt_evnt_init(vvvv_nt_evnt_t *nev,

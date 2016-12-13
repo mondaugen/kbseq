@@ -10,6 +10,7 @@ Event base class
 #include "midi.h" 
 #include "tmstmp.h" 
 #include "ord.h" 
+#include "common.h" 
 
 #include <stddef.h> 
 #include <stdint.h> 
@@ -35,7 +36,8 @@ typedef struct vvvv_evnt_t {
 } vvvv_evnt_t;
 
 #define vvvv_evnt_set_get_midi_pckt_lst(ev,f) ((vvvv_evnt_t*)ev)->get_midi_pckt_lst = f 
-#define vvvv_evnt_set_free(ev,f)              ((vvvv_evnt_t*)ev->free = f 
+#define vvvv_evnt_set_free(ev,f)              ((vvvv_evnt_t*)ev)->free = f 
+#define vvvv_evnt_set_get_ord(ev,f)           ((vvvv_evnt_t*)ev)->get_ord = f 
 
 void vvvv_evnt_init(vvvv_evnt_t *ev,
                     vvvv_tmstmp_t ts,

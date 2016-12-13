@@ -3,9 +3,10 @@
 
 typedef enum {
     vvvv_err_NONE = 0,
-    vvvv_err_EINVAL,
-    vvvv_err_NOTIMP,
-    vvvv_err_EFULL;
+    vvvv_err_EINVAL,    /* Invalid */
+    vvvv_err_NOTIMP,    /* Not implemented */
+    vvvv_err_EFULL,     /* Full */
+    vvvv_err_EBNDS,     /* Out of bounds */
 } vvvv_err_t;
 
 

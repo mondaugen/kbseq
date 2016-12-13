@@ -53,7 +53,7 @@ static inline MMDLList *MMDLList_insertBefore(MMDLList *whom, MMDLList *who)
 
 /* Inserts who before whom and returns who. If whom is the head of a list, who
  * becomes the new head and this returns it. */
-static inline MMDLList *MMDLList_pushBefore(MMDlList *whom, MMDLList *who)
+static inline MMDLList *MMDLList_pushBefore(MMDLList *whom, MMDLList *who)
 {
     (void) MMDLList_insertBefore(whom,who);
     return who;
