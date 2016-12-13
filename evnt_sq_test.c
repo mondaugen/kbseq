@@ -144,22 +144,22 @@ static int evnt_sq_nt_evnt_simultaneous_test(void)
                               NUM_LIST_ELEMS,
                               SEQ_TICK_DUR);
     struct nt_dat_t ntdat[] = {
-        {0, 100, 0 * SEQ_TICK_DUR, 2 * SEQ_TICK_DUR, NULL},
-        {0, 99,  0 * SEQ_TICK_DUR, 1 * SEQ_TICK_DUR, NULL},
-        {2, 101, 0 * SEQ_TICK_DUR, 3 * SEQ_TICK_DUR, NULL},
+        {1, 100, 0 * SEQ_TICK_DUR + 1, 2 * SEQ_TICK_DUR, NULL},
+        {0, 99,  0 * SEQ_TICK_DUR,     1 * SEQ_TICK_DUR, NULL},
+        {2, 101, 0 * SEQ_TICK_DUR,     3 * SEQ_TICK_DUR, NULL},
         // shouldn't play, list will be full
-        {3, 102, 0 * SEQ_TICK_DUR, 3 * SEQ_TICK_DUR, NULL}, 
-        {0, 99,  1 * SEQ_TICK_DUR, 1 * SEQ_TICK_DUR, NULL},
-        {1, 98,  2 * SEQ_TICK_DUR, 1 * SEQ_TICK_DUR, NULL},
-        {1, 97,  3 * SEQ_TICK_DUR, 1 * SEQ_TICK_DUR, NULL} };
+        {3, 102, 0 * SEQ_TICK_DUR,     3 * SEQ_TICK_DUR, NULL}, 
+        {0, 99,  1 * SEQ_TICK_DUR - 1, 1 * SEQ_TICK_DUR, NULL},
+        {1, 98,  2 * SEQ_TICK_DUR,     1 * SEQ_TICK_DUR, NULL},
+        {1, 97,  3 * SEQ_TICK_DUR,     1 * SEQ_TICK_DUR, NULL} };
     size_t n;
     size_t n_notes = sizeof(ntdat)/sizeof(struct nt_dat_t);
     for (n = 0; n < n_notes; n++) {
         vvvv_nt_evnt_t *ne;
         ne = (vvvv_nt_evnt_t*)malloc(sizeof(vvvv_nt_evnt_t));
         vvvv_nt_evnt_init(ne,
-                ntdat[n].ts * SEQ_TICK_DUR,
-                ntdat[n].len * SEQ_TICK_DUR, 
+                ntdat[n].ts,
+                ntdat[n].len, 
                 vvvv_nt_evnt_typ_PITCHED);
         ne->dt.pitched.pitch = ntdat[n].pitch;
         ne->dt.pitched.vel = ntdat[n].vel;
@@ -168,16 +168,20 @@ static int evnt_sq_nt_evnt_simultaneous_test(void)
         if ((err = vvvv_evnt_sq_add(es, (vvvv_evnt_t*)ne))) {
             printf("Not added, err = %d.\n", (int)err);
             ntdat[n].ne = NULL;
+        } else {
+            ntdat[n].ne = ne;
         }
     }
-    // Do first events at indices 0,1,2,4,5
+    // Do first events at indices 2,0,1,4,5
+    // First three events in this order because they are sorted by pitch and the
+    // highest pitch is at the head of the list
     struct wp_lst_t *wpl1 = NULL, *wpl_ptr, *tmp;
     vvvv_evnt_sq_mp_rng_t esmr = {evnt_func, (void*)&wpl1 };
     vvvv_evnt_sq_map_range(es, 0, 3 * SEQ_TICK_DUR, &esmr);
     wpl_ptr = wpl1;
-    printf("Events 0,1,2,4,5.\n");
-    size_t evnt_idx[] = {0,1,2,4,5};
-    // Check to see it correctly extracts the first 3 events
+    printf("Events 2,0,1,4,5.\n");
+    size_t evnt_idx[] = {2,0,1,4,5};
+    // Check to see it correctly extracts the first 5 events
     for (n = sizeof(evnt_idx)/sizeof(size_t); n > 0; n--) {
         passed &= ntdat[evnt_idx[n-1]].ne == wpl_ptr->dat; 
         assert(passed == 1);
@@ -191,11 +195,18 @@ static int evnt_sq_nt_evnt_simultaneous_test(void)
     }
 
     // Remove events
+    // Removal order
+    size_t evnt_idx2[] = {2, 0, 1, 4, 5, 6}; 
+    size_t idx_ = 0;
     for (n = 0; n < es->len; n++) {
         while (es->evnt_lsts[n]->lst_head) {
+            vvvv_evnt_t *ev = es->evnt_lsts[n]->lst_head->evnt;
+            passed &= ((vvvv_evnt_t*)ntdat[evnt_idx2[idx_++]].ne == ev);
+            assert(passed == 1);
             vvvv_evnt_lst_rm_elem(es->evnt_lsts[n],
                     es->evnt_lsts[n]->lst_head,
                     vvvv_evnt_lst_rm_opt_FREVNT);
+
         }
     }
     
