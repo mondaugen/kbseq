@@ -1,4 +1,4 @@
-def="-DOSX -DDEBUG";
+def="-DOSX -DDEBUG -DHAVE_MALLOC";
 inc=-I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers;
 src="heap.c mnoh.c evnt.c nt_evnt.c nt_evnt_test.c";
 lib="-framework coremidi"

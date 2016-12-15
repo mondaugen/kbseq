@@ -1,6 +1,10 @@
 #include "nt_evnt.h"
 #include "midi.h" 
 
+#if HAVE_MALLOC
+#include <stdlib.h>
+#endif
+
 static vvvv_nt_evnt_vt_t  vvvv_nt_evnt_vt;
 static vvvv_nt_evnt_vt_t *vvvv_nt_evnt_vt_p = NULL;
 
@@ -111,4 +115,34 @@ void vvvv_nt_evnt_init(vvvv_nt_evnt_t *nev,
         default:
             break;
     }
+}
+
+static void nt_evnt_free(vvvv_evnt_t* ev)
+{
+#if HAVE_MALLOC
+    free(ev);
+#else
+#error "No allocation method defined."
+#endif
+}
+
+/* Allocate pointer to new initialized nt_evnt.
+ * Returns NULL if allocation fails, e.g., if out of memory.
+ */
+vvvv_nt_evnt_t *vvvv_nt_evnt_new(vvvv_tmstmp_t ts,
+                                 vvvv_tmstmp_t len,
+                                 vvvv_nt_evnt_typ_t typ)
+{
+    vvvv_nt_evnt_t *ret;
+#if HAVE_MALLOC
+    ret = (vvvv_nt_evnt_t*)malloc(sizeof(vvvv_nt_evnt_t));
+    if (!ret) {
+        return NULL;
+    }
+#else
+#error "No allocation method defined."
+#endif
+    vvvv_nt_evnt_init(ret,ts,len,typ);
+    vvvv_evnt_set_free(ret,nt_evnt_free);
+    return ret;
 }

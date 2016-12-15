@@ -4,6 +4,7 @@
  */
 #include "mnoh.h"
 #include "test.h" 
+#include <string.h> 
 
 	//MIDITimeStamp		timeStamp;
 	//UInt16				length;
@@ -13,6 +14,7 @@
 
 int vvvv_mnoh_test_ordered(void)
 {
+    int passed = 1;
     vvvv_midi_pckt_t noteon_packets[] = {
         {0,3,{MIDIMSG_NOTE_ON,1,100}},
         {2,3,{MIDIMSG_NOTE_ON,2,99}},
@@ -32,6 +34,23 @@ int vvvv_mnoh_test_ordered(void)
         {21,3,{MIDIMSG_NOTE_OFF,1,11}}
     };
 
+    vvvv_midi_pckt_t *correct_packets[] = {
+        &noteon_packets[0],
+        &noteon_packets[1],
+        &noteon_packets[2],
+        &noteon_packets[3],
+        &noteon_packets[4],
+        &noteoff_packets[2],
+        &noteoff_packets[5],
+        &noteoff_packets[3],
+        &noteoff_packets[7],
+        &noteoff_packets[4],
+    };
+
+    vvvv_midi_pckt_t *packets_in_order[10];
+    size_t pio_idx = 0;
+
+
     size_t i;
     vvvv_mnoh_t *mnoh;
     VVVV_MNOH_ALLOC_STACK(mnoh);
@@ -44,6 +63,8 @@ int vvvv_mnoh_test_ordered(void)
 
 #ifdef OSX
     MIDITimeStamp time = 0;
+#else
+#error "No valid timestamp type."
 #endif 
     while (time < MAX_TIME) {
         for (i = 0;
@@ -51,6 +72,10 @@ int vvvv_mnoh_test_ordered(void)
              i++) {
             if (time == noteon_packets[i].timeStamp) {
                 print_note_packet(&noteon_packets[i]);
+                if (pio_idx == 10) {
+                    assert(0);
+                }
+                packets_in_order[pio_idx++] = &noteon_packets[i];
             }
         }
         while (mnoh->heap.size) {
@@ -61,6 +86,10 @@ int vvvv_mnoh_test_ordered(void)
                 err = Heap_pop(&mnoh->heap,(void**)&elem);
                 if (!err) {
                     print_note_packet(&elem->packet);
+                    if (pio_idx == 10) {
+                        assert(0);
+                    }
+                    packets_in_order[pio_idx++] = &elem->packet;
                 }
             } else {
                 break;
@@ -68,7 +97,18 @@ int vvvv_mnoh_test_ordered(void)
         }
         time++;
     }
-    return 1;
+
+    while (pio_idx--) {
+#ifdef OSX 
+        passed &= (memcmp(packets_in_order[pio_idx],
+                         correct_packets[pio_idx],
+                         sizeof(MIDITimeStamp) + 
+                            sizeof(UInt16) + sizeof(Byte) * 3)
+                    == 0);
+#endif  
+        assert(passed == 1);
+    }
+    return passed;
 }
 
 int main (void)

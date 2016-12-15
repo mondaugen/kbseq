@@ -37,4 +37,23 @@ void vvvv_nt_evnt_init(vvvv_nt_evnt_t *ev,
                        vvvv_tmstmp_t len,
                        vvvv_nt_evnt_typ_t type);
 
+vvvv_nt_evnt_t *vvvv_nt_evnt_new(vvvv_tmstmp_t ts,
+                                 vvvv_tmstmp_t len,
+                                 vvvv_nt_evnt_typ_t typ);
+
+static inline vvvv_nt_evnt_t *
+vvvv_nt_evnt_new_pitched(vvvv_tmstmp_t ts,
+                         vvvv_tmstmp_t len,
+                         float pitch,
+                         float vel)
+{
+    vvvv_nt_evnt_t *ret;
+    if (ret) {
+        ret = vvvv_nt_evnt_new(ts,len,vvvv_nt_evnt_typ_PITCHED);
+        ret->dt.pitched.pitch = pitch;
+        ret->dt.pitched.vel = vel;
+    }
+    return ret;
+}
+
 #endif /* NT_EVNT_H */
