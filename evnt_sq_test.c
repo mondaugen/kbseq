@@ -16,7 +16,7 @@ struct wp_lst_t {
     struct wp_lst_t *next;
 };
 
-static void vvvv_evnt_free(vvvv_evnt_t *ev)
+static void evnt_free(vvvv_evnt_t *ev)
 {
     printf("Freeing event...\n");
     free((void*)ev);
@@ -73,7 +73,7 @@ static int evnt_sq_nt_evnt_test(void)
                 vvvv_nt_evnt_typ_PITCHED);
         ne->dt.pitched.pitch = ntdat[n].pitch;
         ne->dt.pitched.vel = ntdat[n].vel;
-        vvvv_evnt_set_free((vvvv_evnt_t*)ne,vvvv_evnt_free);
+        vvvv_evnt_set_free((vvvv_evnt_t*)ne,evnt_free);
         size_t idx = ntdat[n].ts;
         if (idx < es->len) {
             vvvv_evnt_lst_add(es->evnt_lsts[idx],
@@ -163,7 +163,7 @@ static int evnt_sq_nt_evnt_simultaneous_test(void)
                 vvvv_nt_evnt_typ_PITCHED);
         ne->dt.pitched.pitch = ntdat[n].pitch;
         ne->dt.pitched.vel = ntdat[n].vel;
-        vvvv_evnt_set_free((vvvv_evnt_t*)ne,vvvv_evnt_free);
+        vvvv_evnt_set_free((vvvv_evnt_t*)ne,evnt_free);
         vvvv_err_t err;
         if ((err = vvvv_evnt_sq_add(es, (vvvv_evnt_t*)ne))) {
             printf("Not added, err = %d.\n", (int)err);

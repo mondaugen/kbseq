@@ -47,10 +47,10 @@ vvvv_err_t vvvv_evnt_lst_add(vvvv_evnt_lst_t *elt, vvvv_evnt_t *evnt)
                 elt->lst_head = &elt->elems[n];
             } else {
                 vvvv_evnt_lst_elm_t **le_ptr = &elt->lst_head;
-                vvvv_ord_t ord = evnt->get_ord(evnt);
+                vvvv_ord_t ord = vvvv_evnt_get_ord(evnt);
                 while (1) {
                     // Puts in descending order
-                    if ((*le_ptr)->evnt->get_ord((*le_ptr)->evnt) <
+                    if (vvvv_evnt_get_ord((*le_ptr)->evnt) <
                             ord) {
                         (void) MMDLList_insertBefore((MMDLList*)*le_ptr,
                                 (MMDLList*)&elt->elems[n]);

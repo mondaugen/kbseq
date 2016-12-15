@@ -3,6 +3,10 @@
 
 #include "evnt.h" 
 
+typedef struct vvvv_nt_evnt_vt_t {
+    vvvv_evnt_vt_t super;
+} vvvv_nt_evnt_vt_t;
+
 typedef struct vvvv_nt_evnt_t vvvv_nt_evnt_t;
 
 typedef enum {
@@ -13,6 +17,7 @@ typedef enum {
 typedef struct vvvv_nt_evnt_ptchd_t {
     float pitch;
     float vel;
+    /* Not sure if we want this to be same for all instances yet. */
     vvvv_err_t (*get_midi_note_on)(vvvv_nt_evnt_t *, vvvv_midi_pckt_t *);
     vvvv_err_t (*get_midi_note_off)(vvvv_nt_evnt_t *, vvvv_midi_pckt_t *);
 } vvvv_nt_evnt_ptchd_t;

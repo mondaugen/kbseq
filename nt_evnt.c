@@ -1,6 +1,9 @@
 #include "nt_evnt.h"
 #include "midi.h" 
 
+static vvvv_nt_evnt_vt_t  vvvv_nt_evnt_vt;
+static vvvv_nt_evnt_vt_t *vvvv_nt_evnt_vt_p = NULL;
+
 /*
 Pitch simply casted,
 Velocity assumed to be between 0 and 1, and is scaled appropriately.
@@ -70,7 +73,18 @@ static vvvv_err_t get_midi_pckt_lst(vvvv_evnt_t *ev,
 static vvvv_ord_t get_ord(vvvv_evnt_t *ev)
 {
     vvvv_nt_evnt_t *nev = (vvvv_nt_evnt_t*)ev;
-    return (vvvv_ord_t)nev->dt.pitched.pitch;
+    if (nev->typ == vvvv_nt_evnt_typ_PITCHED) {
+        return (vvvv_ord_t)nev->dt.pitched.pitch;
+    }
+    return 0;
+}
+
+vvvv_nt_evnt_vt_t *vvvv_nt_evnt_vt_init(vvvv_nt_evnt_vt_t *vt)
+{
+    vt = (vvvv_nt_evnt_vt_t*)vvvv_evnt_vt_init((vvvv_evnt_vt_t*)vt);
+    ((vvvv_evnt_vt_t*)vt)->get_ord = get_ord;
+    ((vvvv_evnt_vt_t*)vt)->get_midi_pckt_lst = get_midi_pckt_lst;
+    return vt;
 }
 
 void vvvv_nt_evnt_init(vvvv_nt_evnt_t *nev,
@@ -81,11 +95,13 @@ void vvvv_nt_evnt_init(vvvv_nt_evnt_t *nev,
 #ifdef DEBUG 
     memset(nev,0,sizeof(vvvv_nt_evnt_t));
 #endif  
+    vvvv_evnt_init((vvvv_evnt_t*)nev, ts, len);
+    if (!vvvv_nt_evnt_vt_p) {
+        vvvv_nt_evnt_vt_p = vvvv_nt_evnt_vt_init(&vvvv_nt_evnt_vt);
+    }
+    vvvv_evnt_set_v(nev,vvvv_nt_evnt_vt_p);
     switch (typ) {
         case vvvv_nt_evnt_typ_PITCHED:
-            vvvv_evnt_init((vvvv_evnt_t*)nev, ts, len);
-            vvvv_evnt_set_get_midi_pckt_lst(nev,get_midi_pckt_lst);
-            vvvv_evnt_set_get_ord(nev,get_ord);
             nev->typ = typ;
             nev->dt.pitched.get_midi_note_on = get_midi_note_on;
             nev->dt.pitched.get_midi_note_off = get_midi_note_off;

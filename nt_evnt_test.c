@@ -56,7 +56,7 @@ int vvvv_nt_evnt_no_overlaps_test(void)
                 char buf[VVVV_MIDI_PCKT_LST_SZ(2)];
                 vvvv_midi_pckt_lst_t *mpl = (vvvv_midi_pckt_lst_t*)buf;
                 
-                ev->get_midi_pckt_lst(ev,mpl,VVVV_MIDI_PCKT_LST_SZ(2));
+                vvvv_evnt_get_midi_pckt_lst(ev,mpl,VVVV_MIDI_PCKT_LST_SZ(2));
 #ifdef OSX 
                 vvvv_midi_pckt_t *pckt = &mpl->packet[0];
                 print_note_packet(pckt);
@@ -148,7 +148,7 @@ int vvvv_nt_evnt_with_overlaps_test(void)
             if (ev->ts == ts) {
                 char buf[VVVV_MIDI_PCKT_LST_SZ(2)];
                 vvvv_midi_pckt_lst_t *mpl = (vvvv_midi_pckt_lst_t*)buf;
-                ev->get_midi_pckt_lst(ev,mpl,VVVV_MIDI_PCKT_LST_SZ(2));
+                vvvv_evnt_get_midi_pckt_lst(ev,mpl,VVVV_MIDI_PCKT_LST_SZ(2));
 #ifdef OSX 
                 vvvv_midi_pckt_t *pckt = &mpl->packet[0];
                 print_note_packet(pckt);
