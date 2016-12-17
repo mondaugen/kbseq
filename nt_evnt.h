@@ -3,6 +3,8 @@
 
 #include "evnt.h" 
 
+#define VVVV_NT_EVNT_FLT_CHK_MTCH_TOL (1.e-3f) 
+
 typedef struct vvvv_nt_evnt_vt_t {
     vvvv_evnt_vt_t super;
 } vvvv_nt_evnt_vt_t;
@@ -48,8 +50,8 @@ vvvv_nt_evnt_new_pitched(vvvv_tmstmp_t ts,
                          float vel)
 {
     vvvv_nt_evnt_t *ret;
+    ret = vvvv_nt_evnt_new(ts,len,vvvv_nt_evnt_typ_PITCHED);
     if (ret) {
-        ret = vvvv_nt_evnt_new(ts,len,vvvv_nt_evnt_typ_PITCHED);
         ret->dt.pitched.pitch = pitch;
         ret->dt.pitched.vel = vel;
     }

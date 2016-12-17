@@ -310,6 +310,68 @@ int vvvv_nt_evnt_new_with_overlaps_test(void)
 }
 #undef MAX_TIMESTAMP
 
+int vvvv_nt_evnt_chk_mtch_test(void)
+{
+    int passed = 1;
+    vvvv_nt_evnt_t *ne1;
+    ne1 = vvvv_nt_evnt_new_pitched(123,12u,12.1,10.5);
+
+    if (!ne1) {
+        fprintf(stderr,"Error allocating nt_evnt.\n");
+        return 0;
+    }
+
+    /* Check to see it can find duration */
+    {
+        vvvv_evnt_prm_t ne1_prms[] = {vvvv_evnt_prm_DUR,vvvv_evnt_prm_END};
+        vvvv_evnt_prm_vl_t ne1_vals[] = {{vvvv_evnt_prm_vl_typ_UINT,{ .u = 12u}}};
+        passed &= (vvvv_evnt_chk_mtch(ne1,ne1_prms,ne1_vals) == vvvv_err_NONE);
+        assert(passed == 1);
+    }
+
+    /* Check to see it can't find bad duration */
+    {
+        vvvv_evnt_prm_t ne1_prms[] = {vvvv_evnt_prm_DUR,vvvv_evnt_prm_END};
+        vvvv_evnt_prm_vl_t ne1_vals[] = {{vvvv_evnt_prm_vl_typ_UINT,{ .u = 13u}}};
+        passed &= (vvvv_evnt_chk_mtch(ne1,ne1_prms,ne1_vals) == vvvv_err_NMTCH);
+        assert(passed == 1);
+    }
+
+    /* Check to see it fails on bad type */
+    {
+        vvvv_evnt_prm_t ne1_prms[] = {vvvv_evnt_prm_DUR,vvvv_evnt_prm_END};
+        vvvv_evnt_prm_vl_t ne1_vals[] = {{vvvv_evnt_prm_vl_typ_FLOAT,{ .f = 12.f}}};
+        passed &= (vvvv_evnt_chk_mtch(ne1,ne1_prms,ne1_vals) == vvvv_err_EINVAL);
+        assert(passed == 1);
+    }
+
+    /* Check to see it can find pitch */
+    {
+        vvvv_evnt_prm_t ne1_prms[] = {vvvv_evnt_prm_PITCH,vvvv_evnt_prm_END};
+        vvvv_evnt_prm_vl_t ne1_vals[] = {{vvvv_evnt_prm_vl_typ_FLOAT,{ .f = 12.1}}};
+        passed &= (vvvv_evnt_chk_mtch(ne1,ne1_prms,ne1_vals) == vvvv_err_NONE);
+        assert(passed == 1);
+    }
+
+    /* Check to see it can't find bad pitch */
+    {
+        vvvv_evnt_prm_t ne1_prms[] = {vvvv_evnt_prm_PITCH,vvvv_evnt_prm_END};
+        vvvv_evnt_prm_vl_t ne1_vals[] = {{vvvv_evnt_prm_vl_typ_FLOAT,{ .f = 12.2}}};
+        passed &= (vvvv_evnt_chk_mtch(ne1,ne1_prms,ne1_vals) == vvvv_err_NMTCH);
+        assert(passed == 1);
+    }
+
+    /* Check to see it fails on bad type */
+    {
+        vvvv_evnt_prm_t ne1_prms[] = {vvvv_evnt_prm_PITCH,vvvv_evnt_prm_END};
+        vvvv_evnt_prm_vl_t ne1_vals[] = {{vvvv_evnt_prm_vl_typ_INT,{ .i = 12}}};
+        passed &= (vvvv_evnt_chk_mtch(ne1,ne1_prms,ne1_vals) == vvvv_err_EINVAL);
+        assert(passed == 1);
+    }
+
+    vvvv_evnt_free(ne1);
+    return passed;
+}
 
 int main (void)
 {
@@ -319,5 +381,7 @@ int main (void)
     passed &= vvvv_nt_evnt_with_overlaps_test();
     printf("\n");
     passed &= vvvv_nt_evnt_new_with_overlaps_test();
+    printf("\n");
+    passed &= vvvv_nt_evnt_chk_mtch_test();
     return -1 * (!passed);
 }

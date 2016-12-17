@@ -20,4 +20,6 @@
 /* Gives the rounded result of the quotient of two integers */
 #define VVVV_DIV_ROUND(n,d) (((n) + ((d)/2)) / (d)) 
 
+#define VVVV_ABS(x) ((x) < 0) ? (-1*(x)) : (x)
+
 #endif /* VVVV_COMMON_H */

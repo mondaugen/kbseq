@@ -7,6 +7,7 @@ typedef enum {
     vvvv_err_NOTIMP,    /* Not implemented */
     vvvv_err_EFULL,     /* Full */
     vvvv_err_EBNDS,     /* Out of bounds */
+    vvvv_err_NMTCH,     /* Doesn't match */
 } vvvv_err_t;
 
 

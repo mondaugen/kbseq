@@ -35,7 +35,7 @@ Velocity just set as 0 (even though it is technically possible to have non-zero 
 static vvvv_err_t get_midi_note_off(vvvv_nt_evnt_t *nev, vvvv_midi_pckt_t *pckt)
 {
 #ifdef OSX
-    pckt->timeStamp = ((vvvv_evnt_t*)nev)->ts + ((vvvv_evnt_t*)nev)->len;
+    pckt->timeStamp = ((vvvv_evnt_t*)nev)->ts + ((vvvv_evnt_t*)nev)->dur;
     pckt->length = 3;
     /* Done this way to preserve channel if present */
     pckt->data[0] &= 0xf0;
@@ -83,11 +83,47 @@ static vvvv_ord_t get_ord(vvvv_evnt_t *ev)
     return 0;
 }
 
-vvvv_nt_evnt_vt_t *vvvv_nt_evnt_vt_init(vvvv_nt_evnt_vt_t *vt)
+static vvvv_err_t nt_evnt_chk_mtch(struct vvvv_evnt_t *ev,
+                                   vvvv_evnt_prm_t *prms,
+                                   vvvv_evnt_prm_vl_t *vls)
+{
+    int matched;
+    vvvv_err_t err;
+    if ((err = vvvv_evnt_chk_mtch_dflt(ev,prms,vls)) == vvvv_err_NONE) {
+        matched = 1;
+    } else {
+        return err;
+    }
+    vvvv_nt_evnt_t *nev = (vvvv_nt_evnt_t*)ev;
+    while (matched && (*prms != vvvv_evnt_prm_END)) {
+        switch (*prms) {
+            case vvvv_evnt_prm_PITCH:
+                if (    (vls->typ != vvvv_evnt_prm_vl_typ_FLOAT) ||
+                        (nev->typ != vvvv_nt_evnt_typ_PITCHED)
+                    ) {
+                    return vvvv_err_EINVAL;
+                }
+                matched &= (int)(VVVV_ABS(vls->f - nev->dt.pitched.pitch)
+                                < VVVV_NT_EVNT_FLT_CHK_MTCH_TOL);
+                break;
+            default:
+                break;
+        }
+        prms++;
+        vls++;
+    }
+    if (!matched) {
+        return vvvv_err_NMTCH;
+    }
+    return vvvv_err_NONE;
+}
+
+static vvvv_nt_evnt_vt_t *vvvv_nt_evnt_vt_init(vvvv_nt_evnt_vt_t *vt)
 {
     vt = (vvvv_nt_evnt_vt_t*)vvvv_evnt_vt_init((vvvv_evnt_vt_t*)vt);
     ((vvvv_evnt_vt_t*)vt)->get_ord = get_ord;
     ((vvvv_evnt_vt_t*)vt)->get_midi_pckt_lst = get_midi_pckt_lst;
+    ((vvvv_evnt_vt_t*)vt)->chk_mtch = nt_evnt_chk_mtch;
     return vt;
 }
 
