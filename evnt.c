@@ -25,9 +25,18 @@ vvvv_err_t vvvv_evnt_chk_mtch_dflt(struct vvvv_evnt_t *ev,
                               vvvv_evnt_prm_t *prms,
                               vvvv_evnt_prm_vl_t *vls)
 {
+    if ((!prms) || (!vls)) {
+        return vvvv_err_EINVAL;
+    }
     int matched = 1;
     while (matched && (*prms != vvvv_evnt_prm_END)) {
         switch (*prms) {
+            case vvvv_evnt_prm_TS:
+                if (vls->typ != vvvv_evnt_prm_vl_typ_UINT) {
+                    return vvvv_err_EINVAL;
+                }
+                matched &= (vls->u == ev->ts);
+                break;
             case vvvv_evnt_prm_DUR:
                 if (vls->typ != vvvv_evnt_prm_vl_typ_UINT) {
                     return vvvv_err_EINVAL;

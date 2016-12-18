@@ -3,6 +3,7 @@
 
 typedef enum {
     vvvv_evnt_prm_END = 0,
+    vvvv_evnt_prm_TS,
     vvvv_evnt_prm_DUR,
     vvvv_evnt_prm_PITCH,
 } vvvv_evnt_prm_t;

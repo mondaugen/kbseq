@@ -92,3 +92,104 @@ void vvvv_evnt_lst_rm_elem(vvvv_evnt_lst_t *lst,
         elm->evnt->free(elm->evnt);
     }
 }
+
+
+/* Find an event using the properties fit for the vvvv_evnt_prm_t *prms and
+ * vvvv_evnt_prm_vl_t *vls fields of the chk_mtch method. Tols contains the
+ * search tolerances, i.e., how off a value can be for it to be a sucessful
+ * match. A tolerance of 0 means the match must be exact. Tolerances are always
+ * unsigned values, in the case of floating point values the float will be made
+ * positive.
+ *
+ * A pointer to the found event is put in ret.
+ *
+ * Current implementation:
+ * The first prms element must be vvvv_evnt_prm_TS. If only this is specified,
+ * and there are multiple events sharing the same time, the one with the highest
+ * pitch is returned.
+ * The second prms element can optionally be vvvv_evnt_prm_PITCH. After the
+ * closest event group is found with the timestamp, the closest pitch is found.
+ * All other searches are not yet supported.
+ */
+vvvv_err_t vvvv_evnt_sq_find(vvvv_evnt_sq *sq,
+                             vvvv_evnt_prm_t *prms,
+                             vvvv_evnt_prm_vl_t *vls,
+                             vvvv_evnt_prm_vl_t *tols,
+                             vvvv_evnt_t **ret)
+{
+    if ((!prms) || (!vals) || (!tols)) {
+        return vvvv_err_EINVAL;
+    }
+    if (prms[0] != vvvv_evnt_prm_TS) {
+        return vvvv_err_EINVAL;
+    }
+    if ((vls[0].typ != vvvv_evnt_prm_vl_typ_UINT) ||
+            (tols[0].typ != vvvv_evnt_prm_vl_typ_UINT)) {
+        return vvvv_err_EINVAL;
+    }
+    if (sq->len == 0) {
+        return vvvv_err_EBNDS;
+    }
+    /* Find nearest event list */
+    size_t idx_min;
+    /* If tolerance greater than starting point, minimum search index is 0 */
+    if (vls[0].u < tols[0].u) {
+        idx_min = 0;
+    } else {
+        idx_min = VVVV_DIV_ROUND(vls[0].u - tols[0].u, sq->tick_dur); 
+    }
+    if (idx_min >= sq->len) {
+        /* Can't find anything */
+        return vvvv_err_NMTCH;
+    }
+    size_t idx = VVVV_DIV_ROUND(vls[0].u, sq->tick_dur);
+    if (idx >= sq->len) {
+        idx = sq->len - 1;
+    }
+    size_t idx_max = VVVV_DIV_ROUND(vls[0].u + tols[0].u, sq->tick_dur); 
+    if (idx_max >= sq->len) {
+        idx_max = sq->len - 1;
+    }
+    vvvv_evnt_lst_elm_t *fl = NULL, *fr = NULL, *fnd = NULL;
+    size_t idx_ = idx;
+    while (idx_ <= idx_max) {
+        if (sq->evnt_lsts[idx_].lst_head) {
+            fr = sq->evnt_lsts[idx_].lst_head;
+            break;
+        }
+        idx_++;
+    }
+    idx_ = idx;
+    while (idx_ >= idx_min) {
+        if (sq->evnt_lsts[idx_].lst_head) {
+            fl = sq->evnt_lsts[idx_].lst_head;
+            break;
+        }
+        idx_--;
+    }
+    if ((!fl) && (!fr)) {
+        /* Nothing found */
+        fndurn vvvv_err_NMTCH;
+    }
+    if (fl && (!fr)) {
+        fnd = fl;
+    } else if (fr && (!fl)) {
+        fnd = fr;
+    } else if ((vls[0].u - fl->evnt->ts) <= (fr->evnt->ts - vls[0].u)) {
+        /* In case of ties, the event to the left wins. */
+        fnd = fl;
+    } else {
+        fnd = fr;
+    }
+    if (prms[1] != vvvv_evnt_prm_PITCH) {
+        /* A pointer to the found event is in ret */
+        *ret = fnd->evnt;
+        return vvvv_err_NONE;
+    }
+    ///* Otherwise search for the pitch. */
+    //while (1) {
+    //    if (!MMDLList_getNext(fnd)) {
+    //        break;
+    //    }
+    //    if (fnd->evnt
+}

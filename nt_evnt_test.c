@@ -314,7 +314,7 @@ int vvvv_nt_evnt_chk_mtch_test(void)
 {
     int passed = 1;
     vvvv_nt_evnt_t *ne1;
-    ne1 = vvvv_nt_evnt_new_pitched(123,12u,12.1,10.5);
+    ne1 = vvvv_nt_evnt_new_pitched(123u,12u,12.1,10.5);
 
     if (!ne1) {
         fprintf(stderr,"Error allocating nt_evnt.\n");
@@ -365,6 +365,57 @@ int vvvv_nt_evnt_chk_mtch_test(void)
     {
         vvvv_evnt_prm_t ne1_prms[] = {vvvv_evnt_prm_PITCH,vvvv_evnt_prm_END};
         vvvv_evnt_prm_vl_t ne1_vals[] = {{vvvv_evnt_prm_vl_typ_INT,{ .i = 12}}};
+        passed &= (vvvv_evnt_chk_mtch(ne1,ne1_prms,ne1_vals) == vvvv_err_EINVAL);
+        assert(passed == 1);
+    }
+
+    /* Check to see it can find timestamp */
+    {
+        vvvv_evnt_prm_t ne1_prms[] = {vvvv_evnt_prm_TS,vvvv_evnt_prm_END};
+        vvvv_evnt_prm_vl_t ne1_vals[] = {{vvvv_evnt_prm_vl_typ_UINT,{ .u = 123u}}};
+        passed &= (vvvv_evnt_chk_mtch(ne1,ne1_prms,ne1_vals) == vvvv_err_NONE);
+        assert(passed == 1);
+    }
+
+    /* Check to see it can't find bad timestamp */
+    {
+        vvvv_evnt_prm_t ne1_prms[] = {vvvv_evnt_prm_TS,vvvv_evnt_prm_END};
+        vvvv_evnt_prm_vl_t ne1_vals[] = {{vvvv_evnt_prm_vl_typ_UINT,{ .u = 124u}}};
+        passed &= (vvvv_evnt_chk_mtch(ne1,ne1_prms,ne1_vals) == vvvv_err_NMTCH);
+        assert(passed == 1);
+    }
+
+    /* Check to see it fails on bad type */
+    {
+        vvvv_evnt_prm_t ne1_prms[] = {vvvv_evnt_prm_TS,vvvv_evnt_prm_END};
+        vvvv_evnt_prm_vl_t ne1_vals[] = {{vvvv_evnt_prm_vl_typ_FLOAT,{ .f = 12.f}}};
+        passed &= (vvvv_evnt_chk_mtch(ne1,ne1_prms,ne1_vals) == vvvv_err_EINVAL);
+        assert(passed == 1);
+    }
+
+    /* Check to see it can find with multiple properties */
+    {
+        vvvv_evnt_prm_t ne1_prms[] = {vvvv_evnt_prm_TS,vvvv_evnt_prm_PITCH,vvvv_evnt_prm_END};
+        vvvv_evnt_prm_vl_t ne1_vals[] = {{vvvv_evnt_prm_vl_typ_UINT,{ .u = 123u }},
+                                         {vvvv_evnt_prm_vl_typ_FLOAT,{ .f = 12.1f }}};
+        passed &= (vvvv_evnt_chk_mtch(ne1,ne1_prms,ne1_vals) == vvvv_err_NONE);
+        assert(passed == 1);
+    }
+
+    /* Check to see it can't find with one bad property */
+    {
+        vvvv_evnt_prm_t ne1_prms[] = {vvvv_evnt_prm_TS,vvvv_evnt_prm_PITCH,vvvv_evnt_prm_END};
+        vvvv_evnt_prm_vl_t ne1_vals[] = {{vvvv_evnt_prm_vl_typ_UINT,{ .u = 123u }},
+                                         {vvvv_evnt_prm_vl_typ_FLOAT,{ .f = 12.2f }}};
+        passed &= (vvvv_evnt_chk_mtch(ne1,ne1_prms,ne1_vals) == vvvv_err_NMTCH);
+        assert(passed == 1);
+    }
+
+    /* Check to see it fails on bad type */
+    {
+        vvvv_evnt_prm_t ne1_prms[] = {vvvv_evnt_prm_TS,vvvv_evnt_prm_PITCH,vvvv_evnt_prm_END};
+        vvvv_evnt_prm_vl_t ne1_vals[] = {{vvvv_evnt_prm_vl_typ_UINT,{ .u = 123u }},
+                                         {vvvv_evnt_prm_vl_typ_INT,{ .i = 12 }}};
         passed &= (vvvv_evnt_chk_mtch(ne1,ne1_prms,ne1_vals) == vvvv_err_EINVAL);
         assert(passed == 1);
     }

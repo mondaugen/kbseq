@@ -3,6 +3,7 @@
 
 #include "evnt.h" 
 
+/* Tolerance when matching float values */
 #define VVVV_NT_EVNT_FLT_CHK_MTCH_TOL (1.e-3f) 
 
 typedef struct vvvv_nt_evnt_vt_t {

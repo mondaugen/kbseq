@@ -87,6 +87,9 @@ static vvvv_err_t nt_evnt_chk_mtch(struct vvvv_evnt_t *ev,
                                    vvvv_evnt_prm_t *prms,
                                    vvvv_evnt_prm_vl_t *vls)
 {
+    if ((!prms) || (!vls)) {
+        return vvvv_err_EINVAL;
+    }
     int matched;
     vvvv_err_t err;
     if ((err = vvvv_evnt_chk_mtch_dflt(ev,prms,vls)) == vvvv_err_NONE) {
