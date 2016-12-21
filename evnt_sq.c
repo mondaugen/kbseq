@@ -107,8 +107,11 @@ void vvvv_evnt_lst_rm_elem(vvvv_evnt_lst_t *lst,
  * The first prms element must be vvvv_evnt_prm_TS. If only this is specified,
  * and there are multiple events sharing the same time, the one with the highest
  * pitch is returned.
- * The second prms element can optionally be vvvv_evnt_prm_PITCH. After the
- * closest event group is found with the timestamp, the closest pitch is found.
+ *
+ * The second prms element can optionally be one of vvvv_evnt_prm_t. After the
+ * closest event group is found with the timestamp, the closest event with the
+ * requested parameter is found.
+ *
  * All other searches are not yet supported.
  */
 vvvv_err_t vvvv_evnt_sq_find(vvvv_evnt_sq *sq,
@@ -150,7 +153,9 @@ vvvv_err_t vvvv_evnt_sq_find(vvvv_evnt_sq *sq,
     if (idx_max >= sq->len) {
         idx_max = sq->len - 1;
     }
-    vvvv_evnt_lst_elm_t *fl = NULL, *fr = NULL, *fnd = NULL;
+    vvvv_evnt_lst_elm_t *fl = NULL,
+                        *fr = NULL,
+                        *fnd = NULL;
     size_t idx_ = idx;
     while (idx_ <= idx_max) {
         if (sq->evnt_lsts[idx_].lst_head) {
@@ -186,10 +191,32 @@ vvvv_err_t vvvv_evnt_sq_find(vvvv_evnt_sq *sq,
         *ret = fnd->evnt;
         return vvvv_err_NONE;
     }
-    ///* Otherwise search for the pitch. */
-    //while (1) {
-    //    if (!MMDLList_getNext(fnd)) {
-    //        break;
-    //    }
-    //    if (fnd->evnt
+    {
+        vvvv_evnt_lst_elm_t *tmp = fnd;
+        vvvv_evnt_prm_vl_t vl;
+        vvvv_err_t err;
+        err = vvvv_evnt_chk_dist(tmp->evnt,&prms[1],&vls[1],&vl);
+        if (err) {
+            return err;
+        }
+        tmp = MMDLList_getNext(tmp);
+        while (tmp) {
+            vvvv_evnt_prm_vl_t vl_;
+            err = vvvv_evnt_chk_dist(tmp->evnt,&prms[1],&vls[1],&vl_);
+            if (err) {
+                return err;
+            }
+            int cmpv = vvvv_evnt_prm_vl_t_cmp(&vl_,&vl);
+            if (cmpv == -2) {
+                return vvvv_err_EINVAL;
+            }
+            if (cmpv == -1) {
+                vl = vl_;
+                fnd = tmp;
+            }
+            tmp = MMDLList_getNext(tmp);
+        }
+        *ret = rnd->evnt;
+    }
+    return vvvv_err_NONE;
 }

@@ -22,4 +22,6 @@
 
 #define VVVV_ABS(x) ((x) < 0) ? (-1*(x)) : (x)
 
+#define VVVV_NORM_L1(x,y) (((x) > (y)) ? ((x) - (y)) : ((y) - (x))) 
+
 #endif /* VVVV_COMMON_H */

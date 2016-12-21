@@ -24,4 +24,7 @@ typedef struct vvvv_evnt_prm_vl_t {
     };
 } vvvv_evnt_prm_vl_t;
 
+int vvvv_evnt_prm_vl_t_cmp(vvvv_evnt_prm_vl_t *a,
+                           vvvv_evnt_prm_vl_t *b);
+
 #endif /* EVNT_PRM_H */

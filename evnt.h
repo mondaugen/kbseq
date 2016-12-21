@@ -51,6 +51,10 @@ struct vvvv_evnt_vt_t {
     list.
     */
     vvvv_err_t (*chk_mtch)(struct vvvv_evnt_t *, vvvv_evnt_prm_t *, vvvv_evnt_prm_vl_t *);
+    /*
+    Returns the distance from an event's parameter and the requested parameter.
+    */
+    vvvv_err_t (*chk_dist)(vvvv_evnt_t *, vvvv_evnt_prm_t *, vvvv_evnt_prm_vl_t *, vvvv_evnt_prm_vl_t *);
 };
 
 /* Vector table sets */
@@ -65,6 +69,7 @@ struct vvvv_evnt_vt_t {
 #define vvvv_evnt_get_midi_pckt_lst(ev,l,s) ((vvvv_evnt_t*)ev)->_v->get_midi_pckt_lst((vvvv_evnt_t*)ev,l,s)
 #define vvvv_evnt_get_ord(ev)               ((vvvv_evnt_t*)ev)->_v->get_ord((vvvv_evnt_t*)ev)
 #define vvvv_evnt_chk_mtch(ev,p,v)          ((vvvv_evnt_t*)ev)->_v->chk_mtch((vvvv_evnt_t*)ev,p,v)
+#define vvvv_evnt_chk_dist(ev,p,v,r);       ((vvvv_evnt_t*)ev)->_v->chk_dist((vvvv_evnt_t*)ev,p,v,r)
 #define vvvv_evnt_free(ev)                  ((vvvv_evnt_t*)ev)->free((vvvv_evnt_t*)ev)
 
 vvvv_evnt_vt_t *vvvv_evnt_vt_init(vvvv_evnt_vt_t *vt);
